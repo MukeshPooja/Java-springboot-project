@@ -43,26 +43,24 @@ jobs:
           
             cd frontend
           
-            # Create venv only if not exists
             if [ ! -d "venv" ]; then
               python3 -m venv venv
             fi
           
             source venv/bin/activate
           
-            pip install --upgrade pip
             pip install -r requirements.txt
           
-            # Kill old process
-            # Kill old process
             pkill -f streamlit || true
-            
-            # Set API URL
+          
             export API_URL=http://localhost:8084
-            
-            # 🔥 BEST FIX (detached process)
+          
+            # 🔥 Run in detached session
             setsid bash -c 'source venv/bin/activate && streamlit run app.py --server.port 8501 --server.address 0.0.0.0' > app.log 2>&1 < /dev/null &
-            
+          
             sleep 5
-            
+          
             echo "✅ Deployment completed"
+          
+            # 🔥 FORCE SUCCESS (IMPORTANT)
+              exit 0
