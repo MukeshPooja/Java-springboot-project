@@ -2,8 +2,7 @@ pipeline {
     agent any
     
     tools {
-        // ✅ Use correct tool names from Global Tool Configuration
-        jdk 'JDK-21'              // ← Verify this name exists in Jenkins
+        jdk 'JDK-21'
         maven 'Maven-3.9'
     }
     
@@ -13,10 +12,14 @@ pipeline {
     }
     
     stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        
         stage('Build') {
             steps {
-                sh 'java -version'
-                sh 'mvn -version'
                 sh 'mvn clean package -DskipTests'
             }
         }
@@ -24,16 +27,14 @@ pipeline {
     
     post {
         always {
-            // ✅ Fix: cleanWs must run inside node context
-            node {
-                cleanWs()
-            }
+            // ✅ Fixed: cleanWs() without node {} wrapper
+            cleanWs()
         }
         success {
-            echo '🎉 Build successful!'
+            echo '🎉 Pipeline completed successfully!'
         }
         failure {
-            echo '💥 Build failed - check logs'
+            echo '💥 Pipeline failed - check logs'
         }
     }
 }
